@@ -1,6 +1,7 @@
 HELP.md
 mvnw
 mvnw.cmd
+.gitattributes
 .mvn/
 target/
 .mvn/wrapper/maven-wrapper.jar

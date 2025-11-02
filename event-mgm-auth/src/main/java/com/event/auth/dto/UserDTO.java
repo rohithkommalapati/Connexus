@@ -2,7 +2,6 @@ package com.event.auth.dto;
 
 import com.event.auth.model.User;
 import lombok.*;
-import java.util.List;
 
 @Getter
 @Setter

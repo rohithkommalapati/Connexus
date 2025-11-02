@@ -2,12 +2,10 @@ package com.event.auth.controller;
 
 import com.event.auth.dto.LoginRequestDTO;
 import com.event.auth.dto.RegisterRequestDTO;
-import com.event.auth.exception.UserAlreadyExistsException;
 import com.event.auth.model.User;
 import com.event.auth.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,101 +1,411 @@
 # Connexus
-Event Management & Networking Platform
-A cloud-native event management and attendee networking platform built with Next.js and Spring Boot microservices. The platform enables users to discover events, register for tickets, download QR-based passes, manage professional connections, and receive event-related notifications.
-Overview
-This project is designed as a full-stack, microservice-based platform for organizing events and improving attendee engagement. It combines event discovery, registration, QR ticket generation, attendee profile management, connection requests, and notifications into a single scalable system.
-Key Features
-•	User authentication and profile management: JWT-based signup/login, editable user profiles, skills, bio, and contact information.
-•	Event discovery: Browse, search, filter, and view detailed event information including title, description, date, category, and location.
-•	Organizer dashboard: Create, update, and manage events from a dedicated organizer interface.
-•	Ticket registration: Register for events and generate unique tickets with attendee and event snapshot data.
-•	QR-based ticket validation: Generate QR codes for tickets and support authenticity verification using signed payloads.
-•	Downloadable ticket passes: Generate downloadable PNG tickets containing event details, attendee information, and QR code.
-•	Attendance tracking: Support ticket verification and one-time check-in workflows.
-•	Networking: Send, accept, decline, and manage attendee connection requests.
-•	Profile QR codes: Generate QR codes for user profiles to simplify contact exchange.
-•	Notifications: Store and fetch event updates, registration confirmations, reminders, and connection notifications.
-Tech Stack
-Layer	Technology
-Frontend	Next.js
-Backend	Spring Boot microservices
-Authentication	JWT-based authentication and authorization
-Database	PostgreSQL or MySQL
-Storage	AWS S3 or GCP Cloud Storage for QR codes and ticket images
-Deployment	Vercel for frontend, AWS ECS or GCP Cloud Run for backend services
-Notifications	Database-backed notifications; Google Pub/Sub, Firebase FCM, SES, or SendGrid as future-ready integrations
-Microservices
-•	User Service: Handles authentication, authorization, user profiles, connection requests, and profile QR code generation.
-•	Event Service: Manages event CRUD operations, event discovery, search/filter logic, and attendee registration coordination.
-•	Ticket Service: Generates tickets, QR codes, signed ticket payloads, downloadable PNG passes, ticket verification, and check-in state.
-•	Notification Service: Stores user notifications and exposes APIs for event reminders, registration updates, and connection-related alerts.
-Ticket Service Design
-The Ticket Service uses a hybrid generation approach to keep registration fast and ticket downloads flexible. During registration, the service creates a ticket entity, generates a QR code, uploads the QR image to cloud storage, and immediately returns the ticket details. When the user downloads the ticket, the service dynamically renders the full ticket PNG using the stored ticket snapshot, event details, attendee details, and QR image.
-Ticket Entity Fields
-•	id
-•	ticketUid
-•	eventId
-•	userId
-•	attendeeName
-•	eventTitle
-•	category
-•	location
-•	eventDate
-•	eventStartTime
-•	eventEndTime
-•	status
-•	issuedAt
-•	expiresAt
-•	qrCodeUrl
-•	ticketPngUrl
-•	metadataJson
-•	signature
-•	lastVerifiedAt
-•	checkInTime
+# Event Management & Networking Platform
+
+A cloud-native event management and attendee networking platform built with **Next.js** and **Spring Boot microservices**. The platform enables users to discover events, register for tickets, download QR-based passes, manage professional connections, and receive event-related notifications.
+
+---
+
+## Overview
+
+This project is designed as a full-stack, microservice-based platform for organizing events and improving attendee engagement.
+
+It combines:
+
+- Event discovery
+- Event registration
+- QR-based ticket generation
+- Downloadable ticket passes
+- Attendee profile management
+- Connection requests
+- Profile QR codes
+- Notification management
+
+The system is designed to be scalable, modular, and suitable for cloud deployment.
+
+---
+
+## Key Features
+
+### User Management
+
+- JWT-based signup and login
+- User profile creation and updates
+- Profile fields such as name, bio, skills, and contact information
+- My Connections section
+- Sent, received, pending, accepted, and declined connection requests
+
+### Event Discovery & Management
+
+- Event catalog with list view
+- Search and filter events
+- Event details page
+- Event organizer dashboard
+- Create, update, and manage events
+- Attendee registration management
+
+### Ticketing & QR Passes
+
+- Register for an event and generate a unique ticket
+- Generate unique ticket IDs
+- Generate QR codes for tickets
+- Store QR codes in cloud storage
+- Download ticket as PNG
+- View tickets in a My Tickets page
+- Track ticket status
+- Support ticket verification
+- Support one-time check-in
+
+### Networking Features
+
+- Connect button on attendee profiles
+- Send connection requests
+- Accept or reject received requests
+- View pending requests
+- Store user connections
+- Generate QR code for user profile
+- Download profile QR code as PNG
+- Future support for QR scanning and automatic contact exchange
+
+### Notifications
+
+- Notification panel for users
+- Event reminders
+- Registration confirmations
+- New connection notifications
+- Event update notifications
+- Store notifications in database
+- Fetch notifications per user
+- Future support for email and push notifications
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js |
+| Backend | Spring Boot Microservices |
+| Authentication | JWT |
+| Database | PostgreSQL / MySQL |
+| Cloud Storage | AWS S3 / GCP Cloud Storage |
+| Deployment | Vercel, AWS ECS, GCP Cloud Run |
+| Notifications | Database-backed notifications, Google Pub/Sub, Firebase FCM, SES, SendGrid |
+
+---
+
+## Microservices Architecture
+
+The platform is designed using a microservice-based architecture.
+
+### User Service
+
+Responsible for:
+
+- User registration
+- User login
+- JWT authentication
+- Authorization
+- User profile CRUD operations
+- Connection requests
+- Profile QR code generation
+
+### Event Service
+
+Responsible for:
+
+- Event creation
+- Event updates
+- Event deletion
+- Event listing
+- Event search and filtering
+- Event details
+- Attendee registration coordination
+
+### Ticket Service
+
+Responsible for:
+
+- Ticket creation
+- Unique ticket ID generation
+- QR code generation
+- Ticket PNG generation
+- Ticket download
+- Ticket authenticity verification
+- One-time check-in tracking
+
+### Notification Service
+
+Responsible for:
+
+- Creating notifications
+- Storing notifications
+- Fetching user notifications
+- Event update notifications
+- Registration notifications
+- Connection request notifications
+
+---
+
+## Ticket Service Design
+
+The Ticket Service follows a simple and maintainable hybrid ticket generation approach.
+
+### Hybrid Ticket Generation Flow
+
+#### Stage 1: Registration
+
+When a user registers for an event:
+
+1. The system creates a ticket entity.
+2. A unique ticket ID is generated.
+3. A QR code is generated for the ticket.
+4. The QR code is uploaded to cloud storage.
+5. The QR code URL is stored in the ticket record.
+6. The ticket details are returned immediately to the client.
+
+This keeps registration fast and lightweight.
+
+#### Stage 2: Ticket Download
+
+When the user downloads the ticket:
+
+1. The system fetches the ticket details.
+2. The system fetches the event and attendee snapshot data.
+3. The stored QR code image is retrieved.
+4. The full ticket PNG is dynamically rendered.
+5. The generated PNG ticket is returned to the user for download.
+
+This avoids unnecessary pre-generation of full ticket images during registration.
+
+---
+
+## Ticket Entity Fields
+
+The Ticket entity contains the following fields:
+
+```text
+id
+ticketUid
+eventId
+userId
+attendeeName
+eventTitle
+category
+location
+eventDate
+eventStartTime
+eventEndTime
+status
+issuedAt
+expiresAt
+qrCodeUrl
+ticketPngUrl
+metadataJson
+signature
+lastVerifiedAt
+checkInTime
+
+Key Design Decisions
+Tickets will be generated and provided as PNG images instead of PDFs.
+Operations are synchronous live calls for simplicity.
+Event-driven systems such as Pub/Sub or Kafka can be added later.
+Payments are not currently integrated.
+Ticket cancellation logic is minimal for the initial version.
+QR codes should avoid exposing sensitive user or event data.
+HMAC signatures can be used for ticket authenticity verification.
+Multiple verification checks are allowed.
+Check-in should happen only once per ticket.
+
+
 API Overview
-•	Authentication: signup, login, token validation, and protected route access.
-•	Users: create, read, update, and manage user profiles.
-•	Connections: send, accept, reject, and list connection requests.
-•	Events: create, update, delete, search, filter, and view event details.
-•	Registration: register a user for an event using userId and eventId, with service-side validation of user and event data.
-•	Tickets: create ticket, generate QR code, download ticket PNG, verify authenticity, and perform one-time check-in.
-•	Notifications: fetch user-specific notifications and store event or connection updates.
+Authentication APIs
+
+User signup
+User login
+JWT token validation
+Protected route access
+
+User APIs
+
+Create user profile
+Get user profile
+Update user profile
+Generate user profile QR code
+Download profile QR code
+
+Connection APIs
+
+Send connection request
+Accept connection request
+Reject connection request
+View sent requests
+View received requests
+View accepted connections
+
+Event APIs
+
+Create event
+Update event
+Delete event
+Get all events
+Search events
+Filter events
+Get event details
+Register user for event
+
+Ticket APIs
+
+Create ticket
+Generate ticket QR code
+Download ticket PNG
+Verify ticket authenticity
+Check in ticket
+Get user tickets
+
+Notification APIs
+
+Create notification
+Fetch user notifications
+Mark notification as read
+Store event update notifications
+Store connection request notifications
+
+
+Recommended API Design
+Registration Payload
+For event registration, the recommended payload is:
+JSON{  "userId": "USER_ID",  "eventId": "EVENT_ID"}Show more lines
+The backend should fetch the required user and event details internally using service-to-service communication.
+This keeps the client payload small and avoids trusting client-provided user or event data.
+
+QR Code Payload
+For better security, the QR code should contain only a minimal payload.
+Recommended structure:
+JSON{  "ticketUid": "TICKET_UID",  "signature": "HMAC_SIGNATURE"}Show more lines
+Avoid embedding full user details, event details, or sensitive information directly inside the QR code.
+The backend should verify the ticket by reading the ticket ID and validating the signature.
+
+Verification and Check-In Design
+Recommended approach:
+Use two separate endpoints:
+Plain TextPOST /tickets/{ticketUid}/verifyPOST /tickets/{ticketUid}/check-inShow more lines
+This keeps the responsibilities clear.
+
+Verify endpoint checks whether the ticket is valid.
+Check-in endpoint validates the ticket and marks it as checked in.
+Verification can happen multiple times.
+Check-in should happen only once.
+
+
 Security Considerations
-•	Use JWT for secure authentication and authorization across protected APIs.
-•	Store only safe ticket identifiers in QR payloads instead of exposing full sensitive ticket details.
-•	Use HMAC signatures to validate ticket authenticity and prevent QR tampering.
-•	Allow multiple verification checks, but enforce one-time check-in per ticket.
-•	Keep cloud storage objects private where possible and expose downloads through controlled backend APIs.
-•	Do not commit secrets, database credentials, API keys, or cloud access tokens to the repository.
+
+Use JWT for secure authentication and authorization.
+Do not expose sensitive data in QR codes.
+Use HMAC signatures for ticket authenticity.
+Store only safe identifiers in QR payloads.
+Validate ticket status before check-in.
+Prevent duplicate check-ins.
+Keep cloud storage files private where possible.
+Serve downloads through controlled backend APIs.
+Do not commit secrets or credentials to the repository.
+Store environment variables securely.
+
+
+Cloud Deployment
+Frontend
+The Next.js frontend can be deployed on:
+
+Vercel
+
+Backend
+Spring Boot microservices can be:
+
+Dockerized
+Deployed on AWS ECS
+Deployed on GCP Cloud Run
+
+Database
+Supported database options:
+
+PostgreSQL
+MySQL
+AWS RDS
+GCP Cloud SQL
+
+File Storage
+Used for storing:
+
+QR code images
+Ticket PNG files
+Profile QR codes
+
+Supported storage options:
+
+AWS S3
+GCP Cloud Storage
+
+Notifications
+Possible notification integrations:
+
+Google Pub/Sub
+Firebase Cloud Messaging
+Amazon SES
+SendGrid
+
+
 Getting Started
-Prerequisites: Node.js, Java, Maven or Gradle, Docker, PostgreSQL or MySQL, and a cloud storage account such as AWS S3 or GCP Cloud Storage.
-1.	Clone the repository.
-2.	Configure environment variables for frontend, backend services, database, JWT secret, and storage provider.
-3.	Install frontend dependencies.
-4.	Run backend microservices locally or through Docker.
-5.	Start the Next.js frontend application.
-6.	Register a user, create an event, register for the event, and download a generated ticket PNG.
-Environment Variables
-•	DATABASE_URL
-•	JWT_SECRET
-•	STORAGE_BUCKET_NAME
-•	STORAGE_ACCESS_KEY
-•	STORAGE_SECRET_KEY
-•	FRONTEND_BASE_URL
-•	USER_SERVICE_URL
-•	EVENT_SERVICE_URL
-•	TICKET_SERVICE_URL
-•	NOTIFICATION_SERVICE_URL
+Prerequisites
+Make sure you have the following installed:
+
+Node.js
+Java
+Maven or Gradle
+Docker
+PostgreSQL or MySQL
+AWS or GCP account for storage configuration
+
+
+Local Setup
+1. Clone the Repository
+Shellgit clone <repository-url>cd <repository-name>Show more lines
+2. Configure Environment Variables
+Create the required environment files for frontend and backend services.
+Example variables:
+Plain Textenv isn’t fully supported. Syntax highlighting is based on Plain Text.DATABASE_URL=JWT_SECRET=STORAGE_BUCKET_NAME=STORAGE_ACCESS_KEY=STORAGE_SECRET_KEY=FRONTEND_BASE_URL=USER_SERVICE_URL=EVENT_SERVICE_URL=TICKET_SERVICE_URL=NOTIFICATION_SERVICE_URL=Show more lines
+3. Install Frontend Dependencies
+Shellcd frontendnpm installShow more lines
+4. Start the Frontend
+Shellnpm run devShow more lines
+5. Start Backend Services
+Run each Spring Boot microservice individually or through Docker.
+Shellcd user-servicemvn spring-boot:runShow more lines
+Repeat the same for:
+
+Event Service
+Ticket Service
+Notification Service
+
+
 Roadmap
-•	User and organizer role categorization.
-•	Live chat between attendees or event participants.
-•	QR scanning flow for automatic contact exchange.
-•	Event-driven notification pipeline using Google Pub/Sub or Kafka.
-•	Email and push notification integrations.
-•	Payment and cancellation workflows.
-•	Admin analytics dashboard for registrations, attendance, and engagement.
-Contributing
-Contributions are welcome. Please create a feature branch, keep changes focused, follow consistent coding standards, and open a pull request with a clear description of the changes made.
+Planned future enhancements:
+
+User and organizer role categorization
+Live chat between attendees
+QR scanning for automatic contact exchange
+Event-driven notification pipeline using Pub/Sub or Kafka
+Email notifications
+Push notifications
+Payment integration
+Ticket cancellation workflow
+Admin analytics dashboard
+Attendance reports
+Event engagement metrics
+
+
+Resume Pitch
+Designed and developed a cloud-native Event Management & Networking Platform using Next.js and Spring Boot microservices.
+Implemented event discovery, QR-based ticketing with downloadable PNG passes, attendee networking through connection requests and profile QR codes, notification management, and cloud-ready deployment architecture using Docker, AWS/GCP storage, and scalable backend services.
+
 License
-This project can be licensed under the MIT License. Update this section based on the license you choose for the repository.
-
-
+This project can be licensed under the MIT License.
+Update this section based on the license you choose for the repository.
